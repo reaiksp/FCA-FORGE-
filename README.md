@@ -91,3 +91,7 @@ models/                 分离权重，Git 忽略
 B（Seed-VC）尚未实现，交接设计位于 [B 架构文档](docs/SEED_VC_B_ARCHITECTURE_HANDOFF.md)。A 的引擎边界在 `studio/engines.py`，共享步骤在 `studio/pipeline.py`。B 应新增适配器和独立环境，沿用现有任务、素材、产物及语言系统。
 
 许可证及出处见 [第三方说明](THIRD_PARTY_NOTICES.md)。
+
+## AI 协作署名
+
+本项目由 reaiksp 发起并维护，OpenAI Codex 协助完成方案设计、A 引擎工作台代码、测试和文档。此署名记录 AI 的协作贡献，不代表 OpenAI 官方项目或背书；项目验证范围见 [实施记录](docs/IMPLEMENTATION_STATUS.md)。

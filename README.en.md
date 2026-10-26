@@ -79,3 +79,7 @@ API documentation: `http://127.0.0.1:7860/docs`. API file references are relativ
 B / Seed-VC remains a future engine; see [the architecture handoff](docs/SEED_VC_B_ARCHITECTURE_HANDOFF.md). Extend `studio/engines.py` and reuse shared workflows in `studio/pipeline.py` rather than replacing the UI or queue.
 
 See [third-party notices](THIRD_PARTY_NOTICES.md) for upstream attribution and licensing boundaries.
+
+## AI collaboration credit
+
+Created and maintained by reaiksp, with assistance from OpenAI Codex on architecture, the A-engine workstation implementation, tests and documentation. This credit acknowledges AI assistance; it does not imply an official OpenAI project or endorsement. See [implementation status](docs/IMPLEMENTATION_STATUS.md) for the validation scope.
