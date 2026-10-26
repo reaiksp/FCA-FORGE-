@@ -1,0 +1,55 @@
+{
+  "repository": "IAHispano/Applio",
+  "revision": "5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d",
+  "files": [
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/predictors/rmvpe.pt",
+      "destination": "rvc/models/predictors/rmvpe.pt",
+      "sha256": "6d62215f4306e3ca278246188607209f09af3dc77ed4232efdd069798c4ec193",
+      "size": 181184272,
+      "sample_rate": null
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/embedders/contentvec/config.json",
+      "destination": "rvc/models/embedders/contentvec/config.json",
+      "sha256": "2ddde063b795d38d9051a7215a092fecf4cfe148b54251e38de51d88d356898b",
+      "size": 1388,
+      "sample_rate": null
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/embedders/contentvec/pytorch_model.bin",
+      "destination": "rvc/models/embedders/contentvec/pytorch_model.bin",
+      "sha256": "d8dd400e054ddf4e6be75dab5a2549db748cc99e756a097c496c099f65a4854e",
+      "size": 378342945,
+      "sample_rate": null
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/pretrained_v2/f0G40k.pth",
+      "destination": "rvc/models/pretraineds/hifi-gan/f0G40k.pth",
+      "sha256": "3b2c44035e782c4b14ddc0bede9e2f4a724d025cd073f736d4f43708453adfcb",
+      "size": 73106273,
+      "sample_rate": 40000
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/pretrained_v2/f0D40k.pth",
+      "destination": "rvc/models/pretraineds/hifi-gan/f0D40k.pth",
+      "sha256": "6b6ab091e70801b28e3f41f335f2fc5f3f35c75b39ae2628d419644ec2b0fa09",
+      "size": 142875703,
+      "sample_rate": 40000
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/pretrained_v2/f0G48k.pth",
+      "destination": "rvc/models/pretraineds/hifi-gan/f0G48k.pth",
+      "sha256": "b5d51f589cc3632d4eae36a315b4179397695042edc01d15312e1bddc2b764a4",
+      "size": 75465569,
+      "sample_rate": 48000
+    },
+    {
+      "url": "https://huggingface.co/IAHispano/Applio/resolve/5c1d7ed4f4cc3c6ee08b6455e499d80221aca85d/Resources/pretrained_v2/f0D48k.pth",
+      "destination": "rvc/models/pretraineds/hifi-gan/f0D48k.pth",
+      "sha256": "2269b73c7a4cf34da09aea99274dabf99b2ddb8a42cbfb065fb3c0aa9a2fc748",
+      "size": 142875703,
+      "sample_rate": 48000
+    }
+  ]
+}

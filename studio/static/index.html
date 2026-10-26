@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cover Studio</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<aside><a class="brand" href="/"><span class="mark">C</span><span>Cover Studio<small>LOCAL AUDIO WORKSPACE</small></span></a>
+<div class="nav-label" data-t="workspace"></div><nav>
+<button class="active" data-page="cover"><span>◉</span><b data-t="cover"></b></button>
+<button data-page="dataset"><span>▤</span><b data-t="dataset"></b></button>
+<button data-page="training"><span>◈</span><b data-t="training"></b></button>
+<button data-page="voices"><span>♫</span><b data-t="voices"></b></button>
+<button data-page="jobs"><span>≋</span><b data-t="jobs"></b><em id="job-count">0</em></button>
+</nav><div class="sidebar-bottom"><div class="local-dot"></div><span data-t="local"></span><small>RVC · Applio</small></div></aside>
+<main>
+<header><div class="breadcrumb">WORKSPACE <span>/</span> <strong id="crumb">Cover</strong></div><div class="header-right"><span class="engine-pill">RVC ENGINE</span><button id="language" class="secondary">EN</button></div></header>
+<div class="content"><div id="notice" role="status" hidden></div>
+<section id="page-cover" class="page active">
+<div class="page-heading"><div><div class="eyebrow">01 / CREATE</div><h1 data-t="coverTitle"></h1><p data-t="coverSubtitle"></p></div><span class="badge" data-t="offline"></span></div>
+<form id="cover-form"><div class="columns"><div class="stack">
+<article class="card"><div class="card-title"><span class="step">1</span><h2 data-t="sourceAudio"></h2></div>
+<label class="dropzone"><span class="upload-icon">↥</span><strong data-t="chooseAudio"></strong><small>WAV, FLAC, MP3, M4A, OGG</small><input id="source" type="file" accept="audio/*,video/mp4" required><span class="filename"></span></label>
+<label data-t="inputType"></label><select id="input-kind"><option value="song" data-t="fullSong"></option><option value="dry" data-t="dryVocal"></option></select>
+<div id="music-upload" hidden><label data-t="optionalMusic"></label><input id="instrumental" type="file" accept="audio/*"></div>
+</article>
+<article class="card"><div class="card-title"><span class="step">2</span><h2 data-t="voiceAndTone"></h2></div><label data-t="targetVoice"></label><select id="voice-select" required></select>
+<div class="field-grid"><div><label data-t="pitch"></label><input id="pitch" type="number" value="0" min="-24" max="24"></div><div><label data-t="indexRate"></label><input id="index-rate" type="number" value="0.3" step="0.05" min="0" max="1"></div><div><label data-t="protect"></label><input id="protect" type="number" value="0.33" step="0.01" min="0" max="0.5"></div><div><label data-t="chunk"></label><input id="chunk" type="number" value="30" min="5" max="60"></div></div>
+</article></div><div class="stack">
+<article class="card"><div class="card-title"><span class="step">3</span><h2 data-t="finish"></h2></div><div class="field-grid"><div><label data-t="vocalGain"></label><input id="vocal-db" type="number" value="0" min="-24" max="12"></div><div><label data-t="musicGain"></label><input id="music-db" type="number" value="-3" min="-24" max="12"></div></div><label data-t="reverb"></label><input id="reverb" type="range" min="0" max="1" step="0.05" value="0.1">
+<label class="check"><input id="cover-dereverb" type="checkbox"><span data-t="dereverb"></span></label><p class="hint" data-t="dereverbHint"></p>
+<div class="divider"></div><div class="deliverable"><span>↳</span><div><strong data-t="stemsKept"></strong><p data-t="stemsHint"></p></div></div>
+<button class="primary full" type="submit" data-t="createCover"></button><p class="hint" data-t="queueHint"></p></article>
+<article class="callout"><span>✦</span><div><strong data-t="startHintTitle"></strong><p data-t="startHint"></p></div></article>
+</div></div></form></section>
+<section id="page-dataset" class="page"><div class="page-heading"><div><div class="eyebrow">02 / PREPARE</div><h1 data-t="datasetTitle"></h1><p data-t="datasetSubtitle"></p></div></div>
+<form id="prepare-form" class="card"><label data-t="datasetName"></label><input id="dataset-name" required maxlength="80"><label data-t="trainingAudio"></label><input id="dataset-files" type="file" accept="audio/*" multiple required><div class="field-grid"><div><label data-t="clipLength"></label><input id="clip-length" type="number" value="6" min="2" max="15" step="1"></div><div class="check-stack"><label class="check"><input id="dataset-separate" type="checkbox"><span data-t="extractVocals"></span></label><label class="check"><input id="dataset-dereverb" type="checkbox"><span data-t="dereverb"></span></label><label class="check"><input id="highpass" type="checkbox"><span data-t="highpass"></span></label></div></div><button class="primary" data-t="prepareDataset"></button></form><div id="datasets" class="stack below"></div></section>
+<section id="page-training" class="page"><div class="page-heading"><div><div class="eyebrow">03 / TRAIN</div><h1 data-t="trainingTitle"></h1><p data-t="trainingSubtitle"></p></div></div>
+<form id="train-form" class="card narrow"><label data-t="voiceName"></label><input id="train-name" required maxlength="80"><label data-t="dataset"></label><select id="dataset-select" required></select><div class="field-grid"><div><label data-t="sampleRate"></label><select id="sample-rate"><option value="40000">40 kHz</option><option value="48000">48 kHz</option></select></div><div><label data-t="epochs"></label><input id="epochs" type="number" value="200" min="1" max="10000"></div><div><label data-t="batchSize"></label><input id="batch" type="number" value="4" min="1" max="32"></div><div><label data-t="saveEvery"></label><input id="save-every" type="number" value="10" min="1" max="1000"></div></div><p class="hint" data-t="trainingHint"></p><button class="primary" data-t="startTraining"></button></form></section>
+<section id="page-voices" class="page"><div class="page-heading"><div><div class="eyebrow">04 / LIBRARY</div><h1 data-t="voices"></h1><p data-t="voicesSubtitle"></p></div></div><form id="voice-form" class="card"><h2 data-t="importVoice"></h2><label data-t="voiceName"></label><input id="import-name" required maxlength="80"><div class="field-grid"><div><label>RVC .pth</label><input id="model-file" type="file" accept=".pth" required></div><div><label data-t="optionalIndex"></label><input id="index-file" type="file" accept=".index"></div></div><button class="primary" data-t="importVoice"></button><p class="hint" data-t="trustedModel"></p></form><div id="voices" class="voice-grid below"></div></section>
+<section id="page-jobs" class="page"><div class="page-heading"><div><div class="eyebrow">05 / ACTIVITY</div><h1 data-t="jobs"></h1><p data-t="jobsSubtitle"></p></div><button class="secondary" id="doctor" data-t="diagnostics"></button></div><div id="diagnostics" hidden class="card"><pre></pre></div><div id="jobs" class="stack"></div></section>
+<footer><span>Cover Studio <b>v0.1</b></span><span data-t="footer"></span></footer></div></main><dialog id="log-dialog"><div class="card-title"><h2 data-t="workerLog"></h2><button class="secondary" id="close-log">×</button></div><pre id="log-text"></pre></dialog>
+<script src="/app.js" type="module"></script></body></html>
