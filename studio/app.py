@@ -5,7 +5,7 @@ import shutil
 import uuid
 import zipfile
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -76,7 +76,7 @@ async def lifespan(app):
     app.state.manager.close()
 
 
-app = FastAPI(title="Cover Studio", lifespan=lifespan)
+app = FastAPI(title="Cover Studio", version="0.2.0", lifespan=lifespan)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "[::1]", "testserver"])
 
 
@@ -105,7 +105,7 @@ def collection(name, filename):
 @app.get("/api/state")
 def state(request: Request):
     return {"jobs": manager(request).snapshot(), "datasets": collection("datasets", "dataset.json"),
-            "voices": collection("voices", "voice.json"), "engines": capabilities(), "defaults": CONFIG}
+            "voices": collection("voices", "voice.json"), "engines": capabilities(), "defaults": CONFIG, "version": app.version}
 
 
 @app.get("/api/diagnostics")
@@ -223,12 +223,30 @@ def job_action(job_id: str, action: Literal["cancel", "retry"], request: Request
         raise HTTPException(404, "Job not found")
 
 
+def existing_job(request: Request, job_id: str):
+    with manager(request).lock:
+        job = manager(request).jobs.get(job_id)
+        if job is None:
+            raise HTTPException(404, "Job not found")
+        return job.copy()
+
+
+@app.get("/api/jobs/{job_id}/metrics")
+def metrics(job_id: str, request: Request):
+    from studio.telemetry import training_metrics
+    return training_metrics(existing_job(request, job_id))
+
+
+@app.get("/api/jobs/{job_id}/console")
+def console(job_id: str, request: Request, cursor: int | None = Query(default=None, ge=0)):
+    from studio.telemetry import read_console
+    return read_console(existing_job(request, job_id), cursor=cursor)
+
+
 @app.get("/api/jobs/{job_id}/log")
-def log(job_id: str):
-    path = resolve(f"jobs/{job_id}/worker.log")
-    with path.open("rb") as stream:
-        stream.seek(max(0, path.stat().st_size - 24000))
-        return {"text": stream.read().decode("utf-8", errors="replace")}
+def log(job_id: str, request: Request):
+    from studio.telemetry import read_console
+    return {"text": read_console(existing_job(request, job_id), limit=24000)["text"]}
 
 
 @app.get("/api/files/{file:path}")

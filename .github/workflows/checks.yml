@@ -8,6 +8,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: python -m pip install -r requirements-app.lock
       - run: python -m pytest -q
       - run: python -m compileall -q studio scripts
+      - run: node --test tests/frontend.test.mjs
+      - run: node --check studio/static/app.js
+      - run: node --check studio/static/professional.js

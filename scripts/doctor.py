@@ -35,7 +35,7 @@ print(json.dumps({'torch': torch.__version__, 'cuda': torch.version.cuda, 'gpu':
 """
     report = {"python": sys.version, "scope": "imports + CUDA matrix operation; no training or real conversion",
               "upstream_expected": CONFIG["commit"],
-              "app": probe(sys.executable, "import fastapi, numpy, scipy, soundfile, imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())"),
+              "app": probe(sys.executable, "import fastapi, numpy, scipy, soundfile, imageio_ffmpeg, tensorboard; print(imageio_ffmpeg.get_ffmpeg_exe()); print('TensorBoard reader', tensorboard.__version__)"),
               "rvc_gpu": probe(python_for(".venv-rvc"), gpu),
               "rvc_import": probe(python_for(".venv-rvc"),
                  "from rvc.infer.infer import VoiceConverter; from rvc.lib.utils import get_hubert_model_class; get_hubert_model_class(); import faiss, sklearn; print('RVC / HuBERT / FAISS imports OK')", UPSTREAM),

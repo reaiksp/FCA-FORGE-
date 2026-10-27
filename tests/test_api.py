@@ -7,6 +7,7 @@ import numpy as np
 import soundfile as sf
 
 from studio.app import app
+from studio.paths import DATA
 
 
 def test_upload_prepare_review_and_persist_without_training():
@@ -55,3 +56,30 @@ def test_model_import_export_does_not_load_pickle():
         exported = client.get(f"/api/voices/{imported.json()['id']}/export")
         with zipfile.ZipFile(io.BytesIO(exported.content)) as archive:
             assert set(archive.namelist()) == {'voice.json', 'model.pth'}
+
+
+def test_professional_endpoints_missing_logs_and_cursor_validation():
+    from studio.paths import write_json
+    import uuid
+    job_id = uuid.uuid4().hex
+    write_json(DATA / 'jobs' / job_id / 'job.json', {
+        'id': job_id, 'kind': 'train', 'request': {'epochs': 10, 'name': 'Telemetry fixture'},
+        'status': 'succeeded', 'stage': 'done', 'created': 1, 'attempt': 1, 'artifacts': [],
+    })
+    with TestClient(app) as client:
+        assert client.get('/api/state').json()['version'] == '0.2.0'
+        assert client.get(f'/api/jobs/{job_id}/metrics').json()['status'] == 'waiting'
+        first = client.get(f'/api/jobs/{job_id}/console').json()
+        assert first['text'] == '' and first['exists'] is False
+        assert client.get(f'/api/jobs/{job_id}/log').json() == {'text': ''}
+        assert client.get(f'/api/jobs/{job_id}/console?cursor=-1').status_code == 422
+        assert client.get('/api/jobs/not-a-real-job/metrics').status_code == 404
+        path = DATA / 'jobs' / job_id / 'worker.log'
+        path.write_bytes('开始\n'.encode('utf-8'))
+        second = client.get(f'/api/jobs/{job_id}/console?cursor=0').json()
+        assert second['text'] == '开始\n'
+        with path.open('ab') as stream:
+            stream.write('下一步\n'.encode('utf-8'))
+        third = client.get(f'/api/jobs/{job_id}/console?cursor={second["cursor"]}').json()
+        assert third['text'] == '下一步\n'
+        assert client.get('/professional.js').status_code == 200

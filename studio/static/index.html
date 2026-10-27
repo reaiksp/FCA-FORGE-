@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cover Studio</title><link rel="stylesheet" href="/style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cover Studio</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/professional.css"></head>
 <body>
 <aside><a class="brand" href="/"><span class="mark">C</span><span>Cover Studio<small>LOCAL AUDIO WORKSPACE</small></span></a>
 <div class="nav-label" data-t="workspace"></div><nav>
@@ -9,9 +9,10 @@
 <button data-page="training"><span>◈</span><b data-t="training"></b></button>
 <button data-page="voices"><span>♫</span><b data-t="voices"></b></button>
 <button data-page="jobs"><span>≋</span><b data-t="jobs"></b><em id="job-count">0</em></button>
+<button data-page="monitor" id="professional-nav" hidden><span>⌁</span><b data-t="monitor"></b><em>PRO</em></button>
 </nav><div class="sidebar-bottom"><div class="local-dot"></div><span data-t="local"></span><small>RVC · Applio</small></div></aside>
 <main>
-<header><div class="breadcrumb">WORKSPACE <span>/</span> <strong id="crumb">Cover</strong></div><div class="header-right"><span class="engine-pill">RVC ENGINE</span><button id="language" class="secondary">EN</button></div></header>
+<header><div class="breadcrumb">WORKSPACE <span>/</span> <strong id="crumb">Cover</strong></div><div class="header-right"><span class="engine-pill">RVC ENGINE</span><button id="mode" class="secondary" aria-pressed="false" data-t="enablePro"></button><button id="language" class="secondary">EN</button></div></header>
 <div class="content"><div id="notice" role="status" hidden></div>
 <section id="page-cover" class="page active">
 <div class="page-heading"><div><div class="eyebrow">01 / CREATE</div><h1 data-t="coverTitle"></h1><p data-t="coverSubtitle"></p></div><span class="badge" data-t="offline"></span></div>
@@ -36,5 +37,13 @@
 <form id="train-form" class="card narrow"><label data-t="voiceName"></label><input id="train-name" required maxlength="80"><label data-t="dataset"></label><select id="dataset-select" required></select><div class="field-grid"><div><label data-t="sampleRate"></label><select id="sample-rate"><option value="40000">40 kHz</option><option value="48000">48 kHz</option></select></div><div><label data-t="epochs"></label><input id="epochs" type="number" value="200" min="1" max="10000"></div><div><label data-t="batchSize"></label><input id="batch" type="number" value="4" min="1" max="32"></div><div><label data-t="saveEvery"></label><input id="save-every" type="number" value="10" min="1" max="1000"></div></div><p class="hint" data-t="trainingHint"></p><button class="primary" data-t="startTraining"></button></form></section>
 <section id="page-voices" class="page"><div class="page-heading"><div><div class="eyebrow">04 / LIBRARY</div><h1 data-t="voices"></h1><p data-t="voicesSubtitle"></p></div></div><form id="voice-form" class="card"><h2 data-t="importVoice"></h2><label data-t="voiceName"></label><input id="import-name" required maxlength="80"><div class="field-grid"><div><label>RVC .pth</label><input id="model-file" type="file" accept=".pth" required></div><div><label data-t="optionalIndex"></label><input id="index-file" type="file" accept=".index"></div></div><button class="primary" data-t="importVoice"></button><p class="hint" data-t="trustedModel"></p></form><div id="voices" class="voice-grid below"></div></section>
 <section id="page-jobs" class="page"><div class="page-heading"><div><div class="eyebrow">05 / ACTIVITY</div><h1 data-t="jobs"></h1><p data-t="jobsSubtitle"></p></div><button class="secondary" id="doctor" data-t="diagnostics"></button></div><div id="diagnostics" hidden class="card"><pre></pre></div><div id="jobs" class="stack"></div></section>
-<footer><span>Cover Studio <b>v0.1</b></span><span data-t="footer"></span></footer></div></main><dialog id="log-dialog"><div class="card-title"><h2 data-t="workerLog"></h2><button class="secondary" id="close-log">×</button></div><pre id="log-text"></pre></dialog>
+<section id="page-monitor" class="page">
+<div class="page-heading"><div><div class="eyebrow">06 / PROFESSIONAL</div><h1 data-t="monitorTitle"></h1><p data-t="monitorSubtitle"></p></div><span class="badge" data-t="liveInterval"></span></div>
+<article class="card monitor-controls"><div class="monitor-selector"><label for="monitor-job" data-t="monitorJob"></label><select id="monitor-job"></select></div><div id="monitor-status" class="status"></div><button id="monitor-refresh" class="secondary" data-t="refreshNow"></button></article>
+<div id="monitor-summary" class="monitor-summary" aria-live="polite"></div>
+<article class="card curve-card"><div class="chart-heading"><div><h2 data-t="trainingCurves"></h2><p class="hint" id="curve-source"></p></div><div class="chart-selectors"><div><label for="monitor-metric" data-t="metric"></label><select id="monitor-metric"></select></div><div><label for="curve-smoothing" data-t="smoothing"></label><select id="curve-smoothing"><option value="0" data-t="smoothingOff"></option><option value="0.6">0.6</option><option value="0.9">0.9</option></select></div></div></div>
+<div id="curve-empty" class="empty" data-t="noTrainingData"></div><div id="curve-container" hidden><svg id="training-chart" viewBox="0 0 1000 290" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title"></title><desc id="chart-desc"></desc></svg><div id="curve-readout" class="curve-readout"></div><p class="hint" data-t="chartHint"></p></div><p id="monitor-warning" class="error" hidden></p></article>
+<article class="card console-card"><div class="chart-heading"><div><h2 data-t="liveConsole"></h2><p class="hint" data-t="consoleHint"></p></div><div class="console-actions"><label class="check"><input id="console-autoscroll" type="checkbox" checked><span data-t="autoScroll"></span></label><button class="secondary" id="console-pause" data-t="pauseConsole"></button><button class="secondary" id="console-clear" data-t="clearConsole"></button><a id="console-download" class="secondary" hidden data-t="downloadLog"></a></div></div><p id="console-error" class="error" role="status" hidden></p><pre id="monitor-console" tabindex="0" role="log" aria-live="off"></pre><p class="hint" id="console-state"></p></article>
+</section>
+<footer><span>Cover Studio <b>v0.2.0</b></span><span data-t="footer"></span></footer></div></main><dialog id="log-dialog"><div class="card-title"><h2 data-t="workerLog"></h2><button class="secondary" id="close-log">×</button></div><pre id="log-text"></pre></dialog>
 <script src="/app.js" type="module"></script></body></html>

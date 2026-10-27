@@ -6,6 +6,8 @@ A local bilingual workstation for AI covers using RVC / Applio. Designed with Ch
 
 ![Workspace](docs/screenshots/cover-en.png)
 
+**v0.2.0 adds Professional mode, training curves and a live console.** Enable Professional mode in the header and select a job in Training monitor. See [the changelog](CHANGELOG.md). Existing Git installations can stop the server, run `update.bat`, then restart with `start.bat`.
+
 ## Features
 
 - Vocal/instrumental separation, optional dereverb, slicing, quiet/clipping flags and manual clip review.
@@ -14,6 +16,9 @@ A local bilingual workstation for AI covers using RVC / Applio. Designed with Ch
 - Full-song or dry-vocal conversion, pitch shift, retrieval ratio, protection and contextual overlap stitching.
 - Vocal/instrumental gains, simple ambience, peak-limited mixing, intermediate downloads and 24-bit WAV output.
 - Persistent local jobs, logs, stop/retry, validated completed-stage caches and manual recovery after restart.
+- Actual TensorBoard loss/gradient/learning-rate curves, smoothing, sample inspection, observed epoch/step/progress and an incremental read-only live console in Professional mode. Missing metrics remain empty.
+
+The selected job refreshes every two seconds. Pause follow affects the log display only; clear view does not delete logs. The console retains its latest 200,000 characters and offers a complete-log download. Charts show at most 1,000 retained points per metric, with explicit warnings when long runs require bounded sampling; source event files stay on disk.
 
 **No personal voice training or real-song conversion has been performed, as requested by the user.** Synthetic-signal and identity-converter tests verify plumbing and stitching, not audio quality. See [implementation status](docs/IMPLEMENTATION_STATUS.md) for measured validation.
 
@@ -71,6 +76,7 @@ Source is ready for Git distribution; environments, weights, recordings, outputs
 
 ```powershell
 .venv/Scripts/python -m pytest -q
+node --test tests/frontend.test.mjs
 .venv/Scripts/python -m uvicorn studio.app:app --host 127.0.0.1 --port 7860
 ```
 

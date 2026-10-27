@@ -1,3 +1,5 @@
+import {ProfessionalMonitor, professionalMessages} from './professional.js';
+
 const messages = {
 zh: {
  workspace:'工作空间', cover:'制作翻唱', dataset:'训练素材', training:'音色训练', voices:'音色库', jobs:'任务与产物', local:'本地处理', offline:'音频留在本机',
@@ -17,12 +19,16 @@ en: {
  }
 };
 const $ = id => document.getElementById(id);
+Object.assign(messages.zh,professionalMessages.zh);
+Object.assign(messages.en,professionalMessages.en);
 let lang = localStorage.getItem('cover-studio-language') === 'en' ? 'en' : 'zh';
+let proMode = localStorage.getItem('cover-studio-mode') === 'pro';
 let page = 'cover', state = {jobs:[], datasets:[], voices:[]}, signatures = {}, logJob = null;
 const t = key => messages[lang][key] ?? key;
 const esc = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const url = file => '/api/files/' + file.split('/').map(encodeURIComponent).join('/');
 const num = id => Number($(id).value);
+const professional = new ProfessionalMonitor({language:()=>lang, api, fileUrl:url, uiText:t});
 // Associate visible field labels with controls for screen readers and keyboard navigation.
 document.querySelectorAll('label').forEach(label => {
  const control = label.nextElementSibling;
@@ -30,8 +36,9 @@ document.querySelectorAll('label').forEach(label => {
 });
 const empty = key => `<div class="empty">${esc(t(key))}</div>`;
 function notice(text, bad=false) { $('notice').hidden=false; $('notice').textContent=text; $('notice').classList.toggle('bad',bad); }
-function showPage(value) { page=value; document.querySelectorAll('.page').forEach(e=>e.classList.toggle('active',e.id===`page-${page}`)); document.querySelectorAll('[data-page]').forEach(e=>e.classList.toggle('active',e.dataset.page===page)); $('crumb').textContent=t(page); }
-function translate() { document.documentElement.lang=lang==='zh'?'zh-CN':'en'; document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t)); $('language').textContent=lang==='zh'?'EN':'中文'; signatures={}; render(); showPage(page); }
+function showPage(value) { page=value; document.querySelectorAll('.page').forEach(e=>e.classList.toggle('active',e.id===`page-${page}`)); document.querySelectorAll('[data-page]').forEach(e=>e.classList.toggle('active',e.dataset.page===page)); $('crumb').textContent=t(page); professional.setActive(proMode&&page==='monitor'); }
+function updateMode() { document.body.classList.toggle('professional-mode',proMode);$('professional-nav').hidden=!proMode;$('mode').setAttribute('aria-pressed',String(proMode));$('mode').textContent=t(proMode?'disablePro':'enablePro');if(!proMode&&page==='monitor')showPage('training');professional.setActive(proMode&&page==='monitor'); }
+function translate() { document.documentElement.lang=lang==='zh'?'zh-CN':'en'; document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t)); $('language').textContent=lang==='zh'?'EN':'中文'; signatures={}; render(); updateMode();showPage(page); }
 async function api(path, body, method='POST') { let response; try { response=await fetch(path, {method:body===undefined?'GET':method, headers:body instanceof FormData?{}:body===undefined?{}:{'Content-Type':'application/json'}, body:body instanceof FormData?body:body===undefined?undefined:JSON.stringify(body)}); } catch {throw Error(t('connectionError'));} const data=await response.json(); if(!response.ok) throw Error(typeof data.detail==='string'?data.detail:JSON.stringify(data.detail)); return data; }
 async function upload(files) { if(!files.length) throw Error(t('missingFile')); notice(t('upload')); const data=new FormData(); for(const file of files)data.append('files',file); return api('/api/uploads',data); }
 function selectOptions(id, items, label) {const element=$(id), previous=element.value; element.replaceChildren(new Option(t('choose'),'')); for(const item of items)element.add(new Option(label(item),item.id)); if(items.some(x=>x.id===previous))element.value=previous;}
@@ -39,6 +46,7 @@ function stageName(name) { if(name==='base-models')return t('pretrained'); if(na
 function kindName(kind) {return t(kind==='reverb'?'reverbStem':kind);}
 function artifactHtml(a) { return `<div class="artifact"><strong>${esc(kindName(a.kind))}</strong><span>${a.duration?`${a.duration.toFixed(1)}s · ${a.sample_rate/1000}kHz`:''}</span>${a.file.endsWith('.wav')?`<audio controls preload="none" src="${url(a.file)}"></audio>`:''}<a href="${url(a.file)}?download=true" download>${esc(t('download'))}</a></div>`; }
 function render() {
+ professional.updateState(state);
  const signature=(key,value)=>{const next=JSON.stringify(value)+lang;if(signatures[key]===next)return false;signatures[key]=next;return true;};
  if(signature('voices',state.voices)) {selectOptions('voice-select',state.voices,x=>x.name); $('voices').innerHTML=state.voices.length?state.voices.map(v=>`<article class="card"><div class="eyebrow">RVC / ${esc(v.id.slice(0,8))}</div><h2>${esc(v.name)}</h2><p class="hint">${v.index?'MODEL + INDEX':'MODEL'}</p><div class="below"><a href="/api/voices/${v.id}/export">${esc(t('exportVoice'))} ↗</a></div></article>`).join(''):empty('emptyVoices');}
  if(signature('datasets',state.datasets)) {selectOptions('dataset-select',state.datasets,d=>`${d.name} (${d.clips.filter(c=>c.included).length} ${t('clips')})`); $('datasets').innerHTML=state.datasets.length?state.datasets.map(d=>`<article class="card"><div class="job-head"><div><h2>${esc(d.name)}</h2><p class="hint">${d.clips.length} ${esc(t('clips'))} · ${d.clips.reduce((a,c)=>a+(c.included?c.duration:0),0).toFixed(1)} ${esc(t('seconds'))} ${esc(t('selected'))}</p></div><button class="secondary" data-save="${d.id}">${esc(t('saveSelection'))}</button></div><details><summary class="hint">${esc(t('clips'))} ↓</summary><div class="clip-list">${d.clips.map(c=>`<div class="clip-row"><label><input type="checkbox" data-dataset="${d.id}" value="${esc(c.file)}" ${c.included?'checked':''}>${esc(c.file.split('/').pop())}</label><span>${c.duration.toFixed(1)}s</span><span class="clip-flag">${c.flags.map(t).map(esc).join(' · ')}</span><audio controls preload="none" src="${url(c.file)}"></audio></div>`).join('')}</div></details></article>`).join(''):empty('emptyDatasets');}
@@ -52,6 +60,7 @@ form('train-form',async()=>{await api('/api/jobs/train',{name:$('train-name').va
 form('voice-form',async()=>{const model=(await upload($('model-file').files))[0].file;const index=$('index-file').files.length?(await upload($('index-file').files))[0].file:null;await api('/api/voices/import',{name:$('import-name').value,model,index});notice(t('imported'));});
 document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>showPage(button.dataset.page)));
 $('language').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';localStorage.setItem('cover-studio-language',lang);translate();});
+$('mode').addEventListener('click',()=>{proMode=!proMode;localStorage.setItem('cover-studio-mode',proMode?'pro':'basic');updateMode();if(proMode)showPage('monitor');});
 $('input-kind').addEventListener('change',()=>$('music-upload').hidden=$('input-kind').value!=='dry');
 $('source').addEventListener('change',()=>$('source').parentElement.querySelector('.filename').textContent=$('source').files[0]?.name || '');
 $('close-log').addEventListener('click',()=>{$('log-dialog').close();logJob=null;});
